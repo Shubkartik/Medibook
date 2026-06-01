@@ -11,6 +11,6 @@ echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 echo "Creating superuser..."
-echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@medibook.com', 'Admin@2024')" | python manage.py shell || true
+python manage.py shell -c "from django.contrib.auth.models import User; User.objects.create_superuser('admin123', 'admin@medibook.com', 'admin123') if not User.objects.filter(username='admin').exists() else print('Admin already exists')"
 
 echo "Build complete!"
