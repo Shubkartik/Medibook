@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointments - MediBook{% endblock %}
+{% block page_title %}Patient Appointments{% endblock %}
+
+{% block content %}
+<div style="animation: fadeIn 0.5s ease;">
+    <!-- Filter Buttons Bar -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <!-- All appointments (default) -->
+            <a href="{% url 'doctor_appointments' %}" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                All
+            </a>
+            <!-- Filter by pending status -->
+            <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-clock"></i> Pending
+            </a>
+            <!-- Filter by confirmed status -->
+            <a href="?status=confirmed" class="btn {% if status_filter == 'confirmed' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-check-circle"></i> Confirmed
+            </a>
+            <!-- Filter by cancelled status -->
+            <a href="?status=cancelled" class="btn {% if status_filter == 'cancelled' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-times-circle"></i> Cancelled
+            </a>
+            <!-- Filter by completed status -->
+            <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-check-double"></i> Completed
+            </a>
+        </div>
+    </div>
+    
+    <!-- Appointments List -->
+    <div class="glass-card">
+        <h3 style="margin-bottom: 20px;">All Appointments</h3>
+        
+        {% if appointments %}
+            <!-- Loop through each appointment -->
+            {% for appointment in appointments %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; 
+                           border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px;">
+                    <div>
+                        <!-- Patient name -->
+                        <h4>{{ appointment.patient.get_full_name }}</h4>
+                        <!-- Patient email -->
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 4px;">
+                            <i class="fas fa-envelope"></i> {{ appointment.patient.email }}
+                        </p>
+                        <!-- Appointment date and time -->
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 4px;">
+                            <i class="fas fa-calendar"></i> {{ appointment.appointment_date }} | 
+                            <i class="fas fa-clock"></i> {{ appointment.appointment_time }}
+                        </p>
+                        <!-- Appointment reason (truncated) -->
+                        <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 4px;">
+                            <i class="fas fa-notes-medical"></i> {{ appointment.reason|truncatewords:15 }}
+                        </p>
+                        <!-- Status badge -->
+                        <span class="status-badge status-{{ appointment.status }}">{{ appointment.status }}</span>
+                        
+                        <!-- Chat button (only for confirmed appointments) -->
+                        {% if appointment.status == 'confirmed' %}
+                            <a href="{% url 'start_chat' appointment.id %}" class="btn btn-primary btn-sm" style="margin-left: 8px;">
+                                <i class="fas fa-comments"></i> Chat with Patient
+                            </a>
+                        {% endif %}
+
+                        <!-- Prescription button (only for confirmed appointments) -->
+                        {% if appointment.status == 'confirmed' %}
+                            <a href="{% url 'create_prescription' appointment.id %}" class="btn btn-primary btn-sm" style="margin-left: 8px;">
+                                <i class="fas fa-prescription"></i> Prescribe
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Action buttons for pending appointments -->
+                    {% if appointment.status == 'pending' %}
+                        <div style="display: flex; gap: 8px;">
+                            <!-- Accept button -->
+                            <a href="{% url 'update_appointment_status' appointment.id 'confirmed' %}" 
+                               class="btn btn-primary btn-sm" onclick="return confirm('Confirm this appointment?')">
+                                <i class="fas fa-check"></i> Accept
+                            </a>
+                            <!-- Reject button -->
+                            <a href="{% url 'update_appointment_status' appointment.id 'cancelled' %}" 
+                               class="btn btn-danger btn-sm" onclick="return confirm('Reject this appointment?')">
+                                <i class="fas fa-times"></i> Reject
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- Empty state when no appointments found -->
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+                <p>No appointments found</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Page entrance animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}

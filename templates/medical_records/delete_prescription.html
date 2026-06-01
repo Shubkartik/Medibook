@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Prescription - MediBook{% endblock %}
+{% block page_title %}Delete Prescription{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 500px; margin: 40px auto; text-align: center;">
+    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 20px;"></i>
+    <h3 style="margin-bottom: 12px;">Delete Prescription?</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 24px;">
+        Are you sure you want to delete the prescription for 
+        <strong>{{ prescription.patient.get_full_name }}</strong> 
+        created on <strong>{{ prescription.created_at|date:"d M, Y" }}</strong>?
+    </p>
+    <p style="color: #ef4444; font-size: 0.875rem; margin-bottom: 24px;">
+        This action cannot be undone.
+    </p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; gap: 12px;">
+            <a href="{% url 'view_prescription' prescription.id %}" class="btn btn-outline" style="flex: 1; justify-content: center;">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-danger" style="flex: 1; justify-content: center;">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

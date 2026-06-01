@@ -1,0 +1,12 @@
+Django==4.2.7
+Pillow==10.1.0
+django-crispy-forms==2.1
+crispy-bootstrap4==2024.1
+channels==4.0.0
+channels-redis==4.1.0
+daphne==4.0.0
+redis==5.0.1
+whitenoise
+gunicorn
+dj-database-url
+

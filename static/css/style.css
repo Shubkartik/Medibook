@@ -1,0 +1,993 @@
+/* ============================================
+   HEALTHCARE APP - COMPLETE STYLESHEET
+   Design System with Glassmorphism & Neumorphism
+   ============================================ */
+
+/* ==================== CSS VARIABLES ==================== */
+/* Centralized design tokens for consistent theming */
+:root {
+    /* Primary Colors - Healthcare Blue/Green Theme */
+    --primary-color: #2563eb;      /* Main brand blue */
+    --primary-dark: #1d4ed8;       /* Darker shade for hover/pressed */
+    --primary-light: #3b82f6;      /* Lighter shade for highlights */
+    --secondary-color: #059669;    /* Green for medical theme */
+    --secondary-dark: #047857;     /* Darker green */
+    --secondary-light: #10b981;    /* Lighter green */
+    
+    /* Accent Colors - For specific UI elements */
+    --accent-color: #8b5cf6;       /* Purple accent */
+    --warning-color: #f59e0b;      /* Warning/alert yellow */
+    --danger-color: #ef4444;       /* Error/danger red */
+    --success-color: #10b981;      /* Success green */
+    --info-color: #3b82f6;         /* Info blue */
+    
+    /* Neutral Colors - Backgrounds and text */
+    --bg-primary: #f0f9ff;         /* Main page background */
+    --bg-secondary: #f8fafc;       /* Secondary background */
+    --bg-white: #ffffff;           /* Card backgrounds */
+    --text-primary: #1e293b;       /* Main text color */
+    --text-secondary: #64748b;     /* Secondary/muted text */
+    --text-light: #94a3b8;         /* Light/placeholder text */
+    --border-color: #e2e8f0;       /* Default borders */
+    
+    /* Shadows - Elevation system */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);      /* Subtle */
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);    /* Medium */
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);  /* Large */
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);  /* Extra large */
+    
+    /* Glassmorphism Effect */
+    --glass-bg: rgba(255, 255, 255, 0.7);       /* Semi-transparent bg */
+    --glass-border: rgba(255, 255, 255, 0.3);   /* Semi-transparent border */
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);  /* Deep shadow */
+    --glass-blur: blur(10px);                    /* Blur amount */
+    
+    /* Border Radius - Rounded corners system */
+    --radius-sm: 0.375rem;   /* Small: buttons, inputs */
+    --radius-md: 0.5rem;     /* Medium: cards */
+    --radius-lg: 1rem;       /* Large: modals */
+    --radius-xl: 1.5rem;     /* Extra large: main cards */
+    --radius-2xl: 2rem;      /* Maximum: special elements */
+    
+    /* Transitions - Animation timing */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);  /* Quick interactions */
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);  /* Standard */
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);  /* Smooth animations */
+    
+    /* Spacing - Consistent padding/margin scale */
+    --spacing-xs: 0.25rem;   /* 4px */
+    --spacing-sm: 0.5rem;    /* 8px */
+    --spacing-md: 1rem;      /* 16px */
+    --spacing-lg: 1.5rem;    /* 24px */
+    --spacing-xl: 2rem;      /* 32px */
+    --spacing-2xl: 3rem;     /* 48px */
+}
+
+/* Dark Mode - Override light theme variables */
+[data-theme="dark"] {
+    /* Inverted primary colors for dark mode */
+    --primary-color: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #60a5fa;
+    --secondary-color: #10b981;
+    --secondary-dark: #059669;
+    --secondary-light: #34d399;
+    
+    /* Dark backgrounds */
+    --bg-primary: #0f172a;     /* Dark page background */
+    --bg-secondary: #1e293b;   /* Dark secondary */
+    --bg-white: #1e293b;       /* Dark card background */
+    --text-primary: #f1f5f9;   /* Light text */
+    --text-secondary: #94a3b8; /* Muted light text */
+    --text-light: #64748b;     /* Darker muted text */
+    --border-color: #334155;   /* Dark borders */
+    
+    /* Dark mode glass effect */
+    --glass-bg: rgba(30, 41, 59, 0.7);
+    --glass-border: rgba(51, 65, 85, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== RESET & BASE ==================== */
+/* Universal reset for consistency */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;  /* Include padding in width/height */
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background-color var(--transition-base), color var(--transition-base);
+    /* Smooth transitions for theme switching */
+}
+
+/* ==================== GLASSMORPHISM CARDS ==================== */
+/* Frosted glass effect cards */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);           /* Background blur */
+    -webkit-backdrop-filter: var(--glass-blur);   /* Safari support */
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--glass-shadow);
+    padding: var(--spacing-xl);
+    transition: all var(--transition-base);
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);      /* Lift effect */
+    box-shadow: var(--shadow-xl);     /* Enhanced shadow */
+}
+
+/* ==================== NEUMORPHISM CARDS ==================== */
+/* Soft 3D effect cards */
+.neumorph-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    box-shadow: 8px 8px 16px #d1d9e6,    /* Dark shadow */
+                -8px -8px 16px #ffffff;    /* Light highlight */
+    padding: var(--spacing-xl);
+    transition: all var(--transition-base);
+}
+
+.neumorph-card:hover {
+    box-shadow: 4px 4px 8px #d1d9e6,     /* Reduced on hover */
+                -4px -4px 8px #ffffff;     /* Creates pressed effect */
+}
+
+/* ==================== SIDEBAR NAVIGATION ==================== */
+/* Fixed left sidebar with glass effect */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 280px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: 1px solid var(--glass-border);
+    padding: var(--spacing-xl);
+    z-index: 1000;              /* Above other content */
+    transition: transform var(--transition-base);
+    overflow-y: auto;           /* Scrollable if content overflows */
+}
+
+/* Sidebar brand logo */
+.sidebar-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-2xl);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.sidebar-logo i {
+    font-size: 2rem;           /* Larger icon */
+}
+
+/* Navigation links list */
+.sidebar-nav {
+    list-style: none;           /* Remove bullet points */
+}
+
+.sidebar-nav li {
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Navigation link styling */
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+/* Active/hover state - gradient background */
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    transform: translateX(5px);     /* Slide right effect */
+    box-shadow: var(--shadow-md);
+}
+
+/* Fixed width for icons alignment */
+.sidebar-nav a i {
+    font-size: 1.25rem;
+    width: 24px;
+    text-align: center;
+}
+
+/* ==================== MAIN CONTENT ==================== */
+/* Offset content to account for sidebar */
+.main-content {
+    margin-left: 280px;         /* Match sidebar width */
+    padding: var(--spacing-xl);
+    min-height: 100vh;
+    transition: margin-left var(--transition-base);
+}
+
+/* ==================== TOP NAVIGATION ==================== */
+/* Sticky top bar with glass effect */
+.top-nav {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-bottom: 1px solid var(--glass-border);
+    padding: var(--spacing-md) var(--spacing-xl);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    position: sticky;
+    top: var(--spacing-md);     /* Sticks to top with gap */
+    z-index: 100;               /* Below sidebar */
+}
+
+/* Left and right sections of top nav */
+.top-nav-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.top-nav-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+/* User profile menu in top nav */
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-fast);
+}
+
+.user-menu:hover {
+    background: var(--bg-primary);  /* Highlight on hover */
+}
+
+/* User avatar image */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;         /* Circular */
+    object-fit: cover;          /* Maintain aspect ratio */
+    border: 2px solid var(--primary-color);
+}
+
+/* ==================== BUTTONS ==================== */
+/* Base button styling */
+.btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-decoration: none;
+    font-size: 0.875rem;
+    position: relative;
+    overflow: hidden;           /* Contain ripple effect */
+}
+
+/* Ripple effect on click */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:hover::before {
+    width: 300px;              /* Expand ripple */
+    height: 300px;
+}
+
+/* Primary button - blue gradient */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* Secondary button - green gradient */
+.btn-secondary {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    color: white;
+    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+}
+
+/* Danger button - red gradient */
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #dc2626);
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* Outline button - transparent with border */
+.btn-outline {
+    background: transparent;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Button size variants */
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+.btn-lg {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+}
+
+/* ==================== FORMS ==================== */
+/* Form group wrapper */
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Form label */
+.form-label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Input/select/textarea styling */
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-white);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+    outline: none;
+}
+
+/* Focus state - blue border with glow */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Placeholder text styling */
+.form-control::placeholder {
+    color: var(--text-light);
+}
+
+/* ==================== ALERT MESSAGES ==================== */
+/* Alert container */
+.alert {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    animation: slideInDown 0.3s ease-out;   /* Slide down entrance */
+    backdrop-filter: blur(10px);            /* Slight blur */
+}
+
+/* Alert variants with semi-transparent backgrounds */
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--warning-color);
+    color: var(--warning-color);
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid var(--info-color);
+    color: var(--info-color);
+}
+
+/* ==================== STATISTICS CARDS ==================== */
+/* Grid layout for stat cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));  /* Responsive grid */
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+/* Individual stat card */
+.stat-card {
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative circle in corner */
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    transform: translate(30%, -30%);     /* Position in corner */
+    opacity: 0.1;                        /* Subtle watermark */
+}
+
+/* Color variants for decorative circle */
+.stat-card.primary::before { background: var(--primary-color); }
+.stat-card.success::before { background: var(--success-color); }
+.stat-card.warning::before { background: var(--warning-color); }
+.stat-card.danger::before { background: var(--danger-color); }
+
+/* Stat icon styling */
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.stat-card.primary .stat-icon { color: var(--primary-color); }
+.stat-card.success .stat-icon { color: var(--success-color); }
+.stat-card.warning .stat-icon { color: var(--warning-color); }
+.stat-card.danger .stat-icon { color: var(--danger-color); }
+
+/* Stat value (number) */
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Stat label (description) */
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* ==================== DOCTOR CARDS ==================== */
+/* Grid for doctor listing */
+.doctor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-xl);
+}
+
+/* Individual doctor card */
+.doctor-card {
+    overflow: hidden;
+    transition: all var(--transition-base);
+}
+
+.doctor-card:hover {
+    transform: translateY(-5px);    /* Lift effect */
+}
+
+/* Doctor profile image */
+.doctor-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Doctor name and details */
+.doctor-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.doctor-specialization {
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Doctor info list */
+.doctor-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-lg);
+}
+
+.doctor-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.doctor-info-item i {
+    width: 20px;
+    color: var(--primary-color);    /* Icon accent */
+}
+
+/* ==================== APPOINTMENT CARDS ==================== */
+/* Appointment list grid */
+.appointment-grid {
+    display: grid;
+    gap: var(--spacing-md);
+}
+
+/* Individual appointment */
+.appointment-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-fast);
+}
+
+.appointment-card:hover {
+    transform: translateX(5px);     /* Slide right on hover */
+}
+
+/* Appointment info section */
+.appointment-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+/* Date badge/calendar */
+.appointment-date {
+    text-align: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border-radius: var(--radius-lg);
+    min-width: 80px;
+}
+
+/* Day number (large) */
+.appointment-date .day {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Month text (small) */
+.appointment-date .month {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+/* Appointment details */
+.appointment-details h4 {
+    margin-bottom: var(--spacing-xs);
+}
+
+.appointment-details p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* ==================== STATUS BADGES ==================== */
+/* Pill-shaped status indicators */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;          /* Fully rounded */
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Status color variants */
+.status-pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color);
+    border: 1px solid var(--warning-color);
+}
+
+.status-confirmed {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.status-cancelled {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+.status-completed {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info-color);
+    border: 1px solid var(--info-color);
+}
+
+/* ==================== LOADING SPINNER ==================== */
+/* Circular loading indicator */
+.spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary-color);     /* Animated part */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;          /* Rotate animation */
+}
+
+/* Spin keyframes */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==================== ANIMATIONS ==================== */
+/* Fade in with upward movement */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide down from top */
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Animation utility classes */
+.animate-fade-in { animation: fadeIn 0.5s ease-out; }
+.animate-slide-in-left { animation: slideInLeft 0.5s ease-out; }
+
+/* ==================== TIME SLOTS ==================== */
+/* Grid of available time slots */
+.time-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-sm);
+    margin: var(--spacing-md) 0;
+}
+
+/* Individual time slot button */
+.time-slot {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+/* Hover state */
+.time-slot:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Selected state */
+.time-slot.selected {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Booked/unavailable state */
+.time-slot.booked {
+    background: var(--bg-secondary);
+    color: var(--text-light);
+    cursor: not-allowed;
+    text-decoration: line-through;   /* Visual indicator */
+}
+
+/* ==================== SEARCH & FILTER ==================== */
+/* Search bar container */
+.search-filter-bar {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    flex-wrap: wrap;            /* Wrap on small screens */
+}
+
+/* Search input wrapper (for icon positioning) */
+.search-input {
+    flex: 1;                    /* Take available space */
+    min-width: 200px;
+    position: relative;
+}
+
+/* Search input field */
+.search-input input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;     /* Left padding for icon */
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--bg-white);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+/* Focus state */
+.search-input input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Search icon positioning */
+.search-input i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);    /* Center vertically */
+    color: var(--text-light);
+}
+
+/* ==================== PAGINATION ==================== */
+/* Pagination container */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xl);
+}
+
+/* Page links */
+.pagination a,
+.pagination span {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+    font-weight: 500;
+}
+
+/* Hover state */
+.pagination a:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Current page indicator */
+.pagination .current {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* ==================== PROFILE SECTION ==================== */
+/* Profile header */
+.profile-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+/* Large profile image */
+.profile-image-large {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
+/* ==================== DARK MODE TOGGLE ==================== */
+/* Toggle switch container */
+.dark-mode-toggle {
+    width: 50px;
+    height: 25px;
+    background: var(--text-secondary);
+    border-radius: 25px;
+    position: relative;
+    cursor: pointer;
+    transition: background var(--transition-fast);
+}
+
+/* Toggle circle (::after pseudo-element) */
+.dark-mode-toggle::after {
+    content: '';
+    position: absolute;
+    width: 21px;
+    height: 21px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition-fast);
+}
+
+/* Active state */
+.dark-mode-toggle.active {
+    background: var(--primary-color);
+}
+
+.dark-mode-toggle.active::after {
+    transform: translateX(25px);    /* Slide circle right */
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet (1024px and below) */
+@media (max-width: 1024px) {
+    /* Hide sidebar by default */
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    /* Show sidebar when toggled */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    /* Full width content */
+    .main-content {
+        margin-left: 0;
+    }
+    
+    /* 2-column stats grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile (768px and below) */
+@media (max-width: 768px) {
+    /* Reduce padding */
+    .main-content {
+        padding: var(--spacing-md);
+    }
+    
+    /* Single column stats */
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Single column doctors */
+    .doctor-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Stack appointment cards vertically */
+    .appointment-card {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-md);
+    }
+    
+    .appointment-info {
+        flex-direction: column;
+    }
+    
+    /* Stack top nav */
+    .top-nav {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    /* Stack search and filter */
+    .search-filter-bar {
+        flex-direction: column;
+    }
+    
+    /* 3-column time slots */
+    .time-slots {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Small mobile (480px and below) */
+@media (max-width: 480px) {
+    /* 2-column time slots */
+    .time-slots {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Full-width buttons */
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ==================== SCROLLBAR STYLING ==================== */
+/* Custom scrollbar for WebKit browsers */
+::-webkit-scrollbar {
+    width: 8px;                 /* Thin scrollbar */
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);  /* Track background */
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--text-light);  /* Scrollbar handle */
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);  /* Darker on hover */
+}
+
+/* ==================== PRINT STYLES ==================== */
+/* Optimize for printing */
+@media print {
+    /* Hide navigation and interactive elements */
+    .sidebar,
+    .top-nav,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Full width content */
+    .main-content {
+        margin-left: 0;
+    }
+}

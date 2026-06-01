@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}My Prescriptions - MediBook{% endblock %}
+{% block page_title %}My Prescriptions{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3><i class="fas fa-prescription" style="color: var(--primary-color);"></i> All Prescriptions</h3>
+        </div>
+        
+        {% if prescriptions %}
+            {% for prescription in prescriptions %}
+                <a href="{% url 'view_prescription' prescription.id %}" style="text-decoration: none; color: inherit;">
+                    <div style="padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px; transition: all 0.3s ease;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <h4>{{ prescription.patient.get_full_name }}</h4>
+                                <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 4px 0;">
+                                    <i class="fas fa-calendar"></i> {{ prescription.created_at|date:"d M, Y" }}
+                                </p>
+                                <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 4px 0;">
+                                    <strong>Diagnosis:</strong> {{ prescription.diagnosis|truncatewords:10 }}
+                                </p>
+                                <p style="color: var(--text-secondary); font-size: 0.8rem;">
+                                    <i class="fas fa-pills"></i> {{ prescription.medicines.count }} medicine(s) prescribed
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status-badge status-confirmed">Active</span>
+                                <br>
+                                <i class="fas fa-chevron-right" style="color: var(--text-secondary); margin-top: 8px;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <i class="fas fa-prescription" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+                <p>No prescriptions created yet.</p>
+                <p style="font-size: 0.875rem;">Create prescriptions from confirmed appointments.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

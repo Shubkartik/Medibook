@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Appointment - MediBook{% endblock %}
+{% block page_title %}Cancel Appointment{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 500px; margin: 40px auto; text-align: center; animation: fadeIn 0.5s ease;">
+    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #f59e0b; margin-bottom: 20px;"></i>
+    <h3 style="margin-bottom: 12px;">Cancel Appointment</h3>
+    <p style="color: var(--text-secondary); margin-bottom: 24px;">
+        Are you sure you want to cancel your appointment with 
+        <strong>Dr. {{ appointment.doctor.user.get_full_name }}</strong> on 
+        <strong>{{ appointment.appointment_date }}</strong> at 
+        <strong>{{ appointment.appointment_time }}</strong>?
+    </p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <div style="margin-bottom: 20px; text-align: left;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Reason for cancellation (optional):</label>
+            <textarea name="cancellation_reason" rows="3" placeholder="Enter reason..."
+                      style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem; font-family: 'Inter', sans-serif;"></textarea>
+        </div>
+        
+        <div style="display: flex; gap: 12px;">
+            <a href="{% url 'my_appointments' %}" class="btn btn-outline" style="flex: 1; justify-content: center;">
+                Go Back
+            </a>
+            <button type="submit" class="btn btn-danger" style="flex: 1; justify-content: center;">
+                <i class="fas fa-times"></i> Confirm Cancel
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}

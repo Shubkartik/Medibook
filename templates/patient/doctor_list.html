@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Doctors - MediBook{% endblock %}
+{% block page_title %}Find Doctors{% endblock %}
+
+{% block content %}
+<div style="animation: fadeIn 0.5s ease;">
+    <!-- Search & Filter Section -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+        <form method="GET">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <!-- Search input with icon -->
+                <div style="flex: 1; min-width: 200px; position: relative;">
+                    <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                    <input type="text" name="search" placeholder="Search doctors..." value="{{ search_query }}" 
+                           style="width: 100%; padding: 12px 16px 12px 44px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 1rem; outline: none;">
+                </div>
+                <!-- Specialization filter dropdown - auto submits on change -->
+                <select name="specialization" onchange="this.form.submit()" 
+                        style="padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 10px; font-size: 1rem; outline: none;">
+                    <option value="">All Specializations</option>
+                    {% for spec in specializations %}
+                        <option value="{{ spec }}" {% if selected_specialization == spec %}selected{% endif %}>
+                            {{ spec }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <!-- Manual search button -->
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Doctor Cards Grid -->
+    {% if page_obj %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+            {% for doctor in page_obj %}
+                <div class="glass-card" style="text-align: center;">
+                    <!-- Doctor Avatar - initials from first/last name -->
+                    <div style="margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); 
+                                   display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; margin: 0 auto 12px;">
+                            {{ doctor.user.first_name|first }}{{ doctor.user.last_name|first }}
+                        </div>
+                        <h3>{{ doctor.user.get_full_name }}</h3>
+                        <p style="color: var(--primary-color); font-weight: 500;">
+                            <i class="fas fa-stethoscope"></i> {{ doctor.specialization }}
+                        </p>
+                    </div>
+                    
+                    <!-- Doctor Details -->
+                    <div style="text-align: left; margin-bottom: 20px;">
+                        <!-- Qualification -->
+                        <p style="margin-bottom: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-graduation-cap" style="color: var(--primary-color); width: 20px;"></i>
+                            {{ doctor.qualification }}
+                        </p>
+                        <!-- Experience Years -->
+                        <p style="margin-bottom: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-briefcase" style="color: var(--primary-color); width: 20px;"></i>
+                            {{ doctor.experience }} Years Exp.
+                        </p>
+                        <!-- Consultation Fees -->
+                        <p style="margin-bottom: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-rupee-sign" style="color: var(--primary-color); width: 20px;"></i>
+                            ₹{{ doctor.fees }} per visit
+                        </p>
+
+                        <!-- Consultation Type & Address/Location -->
+                        <div style="margin-bottom: 8px; font-size: 0.85rem;">
+                            <!-- Consultation type badge (Online/In-Person) -->
+                            <p style="margin: 4px 0; color: #059669;">
+                                <i class="fas fa-video" style="width: 20px; color: #059669;"></i>
+                                {% if doctor.consultation_type == 'online' %}
+                                    Online Consultation
+                                {% elif doctor.consultation_type == 'in_person' %}
+                                    In-Person Consultation
+                                {% else %}
+                                    Online & In-Person
+                                {% endif %}
+                            </p>
+                            <!-- Clinic address if available -->
+                            {% if doctor.clinic_name or doctor.city %}
+                            <p style="margin: 4px 0; color: #64748b; font-size: 0.8rem;">
+                                <i class="fas fa-map-marker-alt" style="width: 20px; color: #ef4444;"></i>
+                                {% if doctor.clinic_name %}{{ doctor.clinic_name }}{% endif %}
+                                {% if doctor.city %}, {{ doctor.city }}{% endif %}
+                                {% if doctor.state %}, {{ doctor.state }}{% endif %}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Available Days -->
+                        <p style="margin-bottom: 8px; font-size: 0.9rem;">
+                            <i class="fas fa-calendar-week" style="color: var(--primary-color); width: 20px;"></i>
+                            {{ doctor.available_days }}
+                        </p>
+                        <!-- Working Hours -->
+                        <p style="font-size: 0.9rem;">
+                            <i class="fas fa-clock" style="color: var(--primary-color); width: 20px;"></i>
+                            {{ doctor.start_time }} - {{ doctor.end_time }}
+                        </p>
+                    </div>
+                    
+                    <!-- Book Appointment Button -->
+                    <a href="{% url 'book_appointment' doctor.id %}" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-calendar-plus"></i> Book Appointment
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+            <div style="display: flex; justify-content: center; gap: 8px; margin-top: 24px;">
+                <!-- Previous Page Link -->
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&specialization={{ selected_specialization }}" 
+                       class="btn btn-outline btn-sm">&laquo; Previous</a>
+                {% endif %}
+                
+                <!-- Page Number Links -->
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <span class="btn btn-primary btn-sm">{{ num }}</span>
+                    {% else %}
+                        <a href="?page={{ num }}&search={{ search_query }}&specialization={{ selected_specialization }}" 
+                           class="btn btn-outline btn-sm">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+                
+                <!-- Next Page Link -->
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&specialization={{ selected_specialization }}" 
+                       class="btn btn-outline btn-sm">Next &raquo;</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- No Results Message -->
+        <div class="glass-card" style="text-align: center; padding: 60px;">
+            <i class="fas fa-user-md" style="font-size: 4rem; color: var(--text-secondary); margin-bottom: 16px; display: block;"></i>
+            <h3>No Doctors Found</h3>
+            <p style="color: var(--text-secondary);">Try adjusting your search criteria.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

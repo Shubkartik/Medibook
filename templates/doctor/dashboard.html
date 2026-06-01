@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard - MediBook{% endblock %}
+{% block page_title %}Doctor Dashboard{% endblock %}
+
+{% block content %}
+<div style="animation: fadeIn 0.5s ease;">
+    <!-- Statistics Cards Grid -->
+    <div class="stats-grid">
+        <!-- Total Appointments Card -->
+        <div class="stat-card glass-card" style="border-left: 4px solid var(--primary-color);">
+            <div class="stat-icon" style="color: var(--primary-color);">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-value">{{ total_appointments }}</div>
+            <div class="stat-label">Total Appointments</div>
+        </div>
+        
+        <!-- Pending Appointments Card -->
+        <div class="stat-card glass-card" style="border-left: 4px solid var(--warning-color);">
+            <div class="stat-icon" style="color: var(--warning-color);">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">{{ pending_appointments }}</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        
+        <!-- Confirmed Appointments Card -->
+        <div class="stat-card glass-card" style="border-left: 4px solid var(--success-color);">
+            <div class="stat-icon" style="color: var(--success-color);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">{{ confirmed_appointments }}</div>
+            <div class="stat-label">Confirmed</div>
+        </div>
+        
+        <!-- Today's Appointments Card -->
+        <div class="stat-card glass-card" style="border-left: 4px solid #8b5cf6;">
+            <div class="stat-icon" style="color: #8b5cf6;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-value">{{ today_appointments }}</div>
+            <div class="stat-label">Today's Appointments</div>
+        </div>
+    </div>
+    
+    <!-- Profile completion warning (shown when specialization not set) -->
+    {% if not doctor.specialization %}
+        <div class="glass-card" style="margin-bottom: 24px; text-align: center; padding: 40px;">
+            <i class="fas fa-user-edit" style="font-size: 3rem; color: var(--warning-color); margin-bottom: 16px; display: block;"></i>
+            <h3>Complete Your Profile</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">Please update your profile to start receiving appointments.</p>
+            <a href="{% url 'update_doctor_profile' %}" class="btn btn-primary">Update Profile</a>
+        </div>
+    {% endif %}
+    
+    <!-- Recent Appointments Section -->
+    {% if recent_appointments %}
+        <div class="glass-card">
+            <h3 style="margin-bottom: 20px;">Recent Appointments</h3>
+            <!-- Loop through recent appointments -->
+            {% for appointment in recent_appointments %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px;">
+                    <div>
+                        <!-- Patient name -->
+                        <h4>{{ appointment.patient.get_full_name }}</h4>
+                        <!-- Appointment date and time -->
+                        <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                            <i class="fas fa-calendar"></i> {{ appointment.appointment_date }} | 
+                            <i class="fas fa-clock"></i> {{ appointment.appointment_time }}
+                        </p>
+                        <!-- Appointment reason (truncated to 10 words) -->
+                        <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                            <i class="fas fa-notes-medical"></i> {{ appointment.reason|truncatewords:10 }}
+                        </p>
+                    </div>
+                    <!-- Status badge -->
+                    <span class="status-badge status-{{ appointment.status }}">{{ appointment.status }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - MediBook{% endblock %}
+{% block page_title %}Messages{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Search Bar -->
+    <div class="glass-card" style="margin-bottom: 20px;">
+        <form method="GET" style="display: flex; gap: 12px;">
+            <div style="flex: 1; position: relative;">
+                <!-- Search icon positioned inside input -->
+                <i class="fas fa-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                <!-- Dynamic placeholder based on user role -->
+                <input type="text" name="search" placeholder="{% if request.user.profile.role == 'patient' %}Search by doctor name or specialization...{% else %}Search by patient name or reason...{% endif %}" 
+                       value="{{ search_query }}"
+                       style="width: 100%; padding: 12px 16px 12px 44px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1rem; outline: none; box-sizing: border-box;">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+            <!-- Clear search button (only shown when search active) -->
+            {% if search_query %}
+                <a href="{% url 'chat_list' %}" class="btn btn-outline btn-sm" style="align-self: center;">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+    
+    <!-- Conversations List -->
+    <div class="glass-card">
+        <h3 style="margin-bottom: 20px;">
+            <i class="fas fa-comments" style="color: #2563eb;"></i> 
+            Conversations
+            <!-- Show search results indicator -->
+            {% if search_query %}
+                <small style="font-size: 0.8rem; color: #64748b;">- Search results for "{{ search_query }}"</small>
+            {% endif %}
+        </h3>
+        
+        {% if chat_rooms %}
+            <!-- Loop through each chat room -->
+            {% for room in chat_rooms %}
+                <!-- Entire card is clickable link -->
+                <a href="{% url 'chat_room' room.id %}" style="text-decoration: none; color: inherit;">
+                    <div style="display: flex; align-items: center; padding: 16px; border: 1px solid #e2e8f0; 
+                               border-radius: 12px; margin-bottom: 12px; transition: all 0.3s ease;">
+                        
+                        <!-- Avatar with initials -->
+                        <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); 
+                                   display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.2rem; margin-right: 16px; flex-shrink: 0;">
+                            {% if request.user.profile.role == 'patient' %}
+                                <!-- Doctor's initials for patient view -->
+                                {{ room.doctor.first_name|first }}{{ room.doctor.last_name|first }}
+                            {% else %}
+                                <!-- Patient's initials for doctor view -->
+                                {{ room.patient.first_name|first }}{{ room.patient.last_name|first }}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Chat info section -->
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div style="flex: 1; min-width: 0;">
+                                    <!-- Name (truncated if too long) -->
+                                    <h4 style="margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {% if request.user.profile.role == 'patient' %}
+                                            Dr. {{ room.doctor.get_full_name }}
+                                        {% else %}
+                                            {{ room.patient.get_full_name }}
+                                        {% endif %}
+                                    </h4>
+                                    
+                                    <!-- Subtitle info based on user role -->
+                                    {% if request.user.profile.role == 'patient' %}
+                                        <!-- Patient sees doctor's specialization -->
+                                        <p style="color: #2563eb; font-size: 0.8rem; font-weight: 500; margin: 2px 0;">
+                                            <i class="fas fa-stethoscope"></i> {{ room.appointment.doctor.specialization }}
+                                        </p>
+                                    {% else %}
+                                        <!-- Doctor sees appointment date -->
+                                        <p style="color: #64748b; font-size: 0.8rem; margin: 2px 0;">
+                                            <i class="fas fa-calendar"></i> {{ room.appointment.appointment_date|date:"d M, Y" }}
+                                        </p>
+                                        <!-- Doctor sees appointment reason (truncated) -->
+                                        <p style="color: #64748b; font-size: 0.75rem; margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            <i class="fas fa-notes-medical"></i> {{ room.appointment.reason|truncatewords:8 }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Date, time, and unread badge -->
+                                <div style="text-align: right; flex-shrink: 0; margin-left: 12px;">
+                                    <!-- Last message date -->
+                                    <small style="color: #64748b; font-size: 0.75rem; display: block;">
+                                        {{ room.last_message_time|date:"d M" }}
+                                    </small>
+                                    <!-- Last message time -->
+                                    <small style="color: #94a3b8; font-size: 0.7rem; display: block;">
+                                        {{ room.last_message_time|time:"h:i A" }}
+                                    </small>
+                                    
+                                    <!-- Unread message count badge -->
+                                    {% if room.unread > 0 %}
+                                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; display: inline-block; margin-top: 4px;">
+                                            {{ room.unread }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right arrow indicator -->
+                        <i class="fas fa-chevron-right" style="color: #94a3b8; margin-left: 8px; flex-shrink: 0;"></i>
+                    </div>
+                </a>
+            {% endfor %}
+        {% else %}
+            <!-- Empty state when no conversations -->
+            <div style="text-align: center; padding: 40px; color: #64748b;">
+                <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+                <p>
+                    {% if search_query %}
+                        No conversations found for "{{ search_query }}"
+                    {% else %}
+                        No conversations yet
+                    {% endif %}
+                </p>
+                <p style="font-size: 0.875rem;">
+                    {% if search_query %}
+                        Try a different search term.
+                    {% else %}
+                        Chat becomes available after your appointment is confirmed.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

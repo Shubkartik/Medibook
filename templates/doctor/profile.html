@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Profile - MediBook{% endblock %}
+{% block page_title %}Update Doctor Profile{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 0 auto; animation: fadeIn 0.5s ease;">
+    <!-- Page Header -->
+    <div style="text-align: center; margin-bottom: 30px;">
+        <i class="fas fa-user-md" style="font-size: 3rem; color: var(--primary-color);"></i>
+        <h2 style="margin-top: 12px;">Complete Your Profile</h2>
+        <p style="color: var(--text-secondary);">Fill in your details to start receiving appointments</p>
+    </div>
+    
+    <!-- Verification Status Banner -->
+    {% if doctor.verification_status == 'pending' %}
+    <!-- Pending verification warning -->
+    <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-clock" style="font-size: 1.5rem; color: #f59e0b;"></i>
+        <div>
+            <strong style="color: #f59e0b;">⏳ Pending Verification</strong>
+            <p style="margin: 4px 0 0; font-size: 0.875rem; color: #92400e;">
+                Your profile is under review. Admin will verify your license details. Patients cannot book until approved.
+            </p>
+        </div>
+    </div>
+    {% elif doctor.verification_status == 'approved' %}
+    <!-- Approved verification success -->
+    <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-check-circle" style="font-size: 1.5rem; color: #10b981;"></i>
+        <div>
+            <strong style="color: #10b981;">✅ Verified Doctor</strong>
+            <p style="margin: 4px 0 0; font-size: 0.875rem; color: #065f46;">
+                Your profile is verified. Patients can now book appointments with you.
+            </p>
+        </div>
+    </div>
+    {% elif doctor.verification_status == 'rejected' %}
+    <!-- Rejected verification error -->
+    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 16px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-times-circle" style="font-size: 1.5rem; color: #ef4444;"></i>
+        <div>
+            <strong style="color: #ef4444;">❌ Verification Rejected</strong>
+            <p style="margin: 4px 0 0; font-size: 0.875rem; color: #991b1b;">
+                Reason: {{ doctor.verification_notes|default:"Please contact admin for details." }}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Profile Form -->
+    <form method="POST" enctype="multipart/form-data" style="max-width: 600px; margin: 0 auto;">
+        {% csrf_token %}
+        
+        <!-- Two-column grid layout -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            
+            <!-- Specialization (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Specialization <span style="color: #ef4444;">*</span>
+                </label>
+                <select name="specialization" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                    <option value="">Select Specialization</option>
+                    <option value="Cardiologist" {% if doctor.specialization == 'Cardiologist' %}selected{% endif %}>Cardiologist</option>
+                    <option value="Dermatologist" {% if doctor.specialization == 'Dermatologist' %}selected{% endif %}>Dermatologist</option>
+                    <option value="Neurologist" {% if doctor.specialization == 'Neurologist' %}selected{% endif %}>Neurologist</option>
+                    <option value="Orthopedic" {% if doctor.specialization == 'Orthopedic' %}selected{% endif %}>Orthopedic</option>
+                    <option value="Pediatrician" {% if doctor.specialization == 'Pediatrician' %}selected{% endif %}>Pediatrician</option>
+                    <option value="Psychiatrist" {% if doctor.specialization == 'Psychiatrist' %}selected{% endif %}>Psychiatrist</option>
+                    <option value="General Physician" {% if doctor.specialization == 'General Physician' %}selected{% endif %}>General Physician</option>
+                    <option value="ENT Specialist" {% if doctor.specialization == 'ENT Specialist' %}selected{% endif %}>ENT Specialist</option>
+                    <option value="Ophthalmologist" {% if doctor.specialization == 'Ophthalmologist' %}selected{% endif %}>Ophthalmologist</option>
+                    <option value="Dentist" {% if doctor.specialization == 'Dentist' %}selected{% endif %}>Dentist</option>
+                </select>
+            </div>
+            
+            <!-- Experience (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Experience (Years) <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="number" name="experience" value="{{ doctor.experience|default:'0' }}" required 
+                       placeholder="Years of experience"
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <!-- Consultation Fee (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Consultation Fee (₹) <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="number" name="fees" value="{{ doctor.fees|default:'500' }}" required 
+                       placeholder="Fee per consultation"
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <!-- Qualification (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Qualification <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" name="qualification" value="{{ doctor.qualification|default:'' }}" required 
+                       placeholder="e.g., MBBS, MD, DM"
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+
+            <!-- Address Section Header -->
+            <div style="grid-column: 1 / -1; border-top: 2px solid #e1e5e9; padding-top: 20px; margin-top: 10px;">
+                <h4 style="margin-bottom: 4px;">📍 Clinic/Hospital Address</h4>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 16px;">
+                    This address will be visible to patients for in-person consultations.
+                </p>
+            </div>
+
+            <!-- Consultation Type (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Consultation Type <span style="color: #ef4444;">*</span>
+                </label>
+                <select name="consultation_type" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                    <option value="both" {% if doctor.consultation_type == 'both' %}selected{% endif %}>Both In-Person & Online</option>
+                    <option value="in_person" {% if doctor.consultation_type == 'in_person' %}selected{% endif %}>In-Person Only</option>
+                    <option value="online" {% if doctor.consultation_type == 'online' %}selected{% endif %}>Online Only</option>
+                </select>
+            </div>
+
+            <!-- Clinic/Hospital Name (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Clinic/Hospital Name
+                </label>
+                <input type="text" name="clinic_name" value="{{ doctor.clinic_name|default:'' }}" 
+                    placeholder="e.g., Apollo Hospital, City Clinic"
+                    style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+
+            <!-- Address Line 1 (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Address Line 1
+                </label>
+                <input type="text" name="address_line1" value="{{ doctor.address_line1|default:'' }}" 
+                    placeholder="e.g., 123, MG Road, Near City Center"
+                    style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+
+            <!-- Address Line 2 (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Address Line 2 (Area/Landmark)
+                </label>
+                <input type="text" name="address_line2" value="{{ doctor.address_line2|default:'' }}" 
+                    placeholder="e.g., Near Central Mall, 2nd Floor"
+                    style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+
+            <!-- City (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">City</label>
+                <input type="text" name="city" value="{{ doctor.city|default:'' }}" 
+                    placeholder="e.g., Mumbai"
+                    style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+
+            <!-- State (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">State</label>
+                <input type="text" name="state" value="{{ doctor.state|default:'' }}" 
+                    placeholder="e.g., Maharashtra"
+                    style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+
+            <!-- Pincode (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Pincode</label>
+                <input type="text" name="pincode" value="{{ doctor.pincode|default:'' }}" 
+                    placeholder="e.g., 400001"
+                    style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+                        
+            <!-- License Verification Section Header -->
+            <div style="grid-column: 1 / -1; border-top: 2px solid #e1e5e9; padding-top: 20px; margin-top: 10px;">
+                <h4 style="margin-bottom: 4px;">🔍 License Verification Details</h4>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 16px;">
+                    These details will be verified by admin against State Medical Council records.
+                </p>
+            </div>
+            
+            <!-- Registration Number (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Registration Number <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" name="registration_number" 
+                       value="{{ doctor.registration_number|default:'' }}" required 
+                       placeholder="e.g., MCI-2010-12345"
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <!-- State Medical Council (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    State Medical Council <span style="color: #ef4444;">*</span>
+                </label>
+                <select name="state_council" required style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                    <option value="">Select Council</option>
+                    <option value="Maharashtra Medical Council" {% if doctor.state_council == 'Maharashtra Medical Council' %}selected{% endif %}>Maharashtra Medical Council</option>
+                    <option value="Delhi Medical Council" {% if doctor.state_council == 'Delhi Medical Council' %}selected{% endif %}>Delhi Medical Council</option>
+                    <option value="Karnataka Medical Council" {% if doctor.state_council == 'Karnataka Medical Council' %}selected{% endif %}>Karnataka Medical Council</option>
+                    <option value="Tamil Nadu Medical Council" {% if doctor.state_council == 'Tamil Nadu Medical Council' %}selected{% endif %}>Tamil Nadu Medical Council</option>
+                    <option value="Gujarat Medical Council" {% if doctor.state_council == 'Gujarat Medical Council' %}selected{% endif %}>Gujarat Medical Council</option>
+                    <option value="West Bengal Medical Council" {% if doctor.state_council == 'West Bengal Medical Council' %}selected{% endif %}>West Bengal Medical Council</option>
+                    <option value="Uttar Pradesh Medical Council" {% if doctor.state_council == 'Uttar Pradesh Medical Council' %}selected{% endif %}>Uttar Pradesh Medical Council</option>
+                    <option value="Rajasthan Medical Council" {% if doctor.state_council == 'Rajasthan Medical Council' %}selected{% endif %}>Rajasthan Medical Council</option>
+                    <option value="Kerala Medical Council" {% if doctor.state_council == 'Kerala Medical Council' %}selected{% endif %}>Kerala Medical Council</option>
+                    <option value="Punjab Medical Council" {% if doctor.state_council == 'Punjab Medical Council' %}selected{% endif %}>Punjab Medical Council</option>
+                    <option value="Other" {% if doctor.state_council == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+            </div>
+            
+            <!-- License Document Upload (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Upload License Document (Optional but Recommended)
+                </label>
+                <input type="file" name="license_document" accept=".pdf,.jpg,.jpeg,.png"
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                <small style="color: #64748b;">Upload your medical license certificate (PDF, JPG, PNG) for faster verification.</small>
+                <!-- Show existing document link if uploaded -->
+                {% if doctor.license_document %}
+                    <p style="margin-top: 8px; color: #10b981;">
+                        <i class="fas fa-check-circle"></i> Document uploaded: 
+                        <a href="{{ doctor.license_document.url }}" target="_blank" style="color: #2563eb;">View Document</a>
+                    </p>
+                {% endif %}
+            </div>
+            
+            <!-- Available Days (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Available Days <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="text" name="available_days" value="{{ doctor.available_days|default:'Monday,Tuesday,Wednesday,Thursday,Friday' }}" required 
+                       placeholder="e.g., Monday,Tuesday,Wednesday"
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                <small style="color: #64748b;">Separate days with commas</small>
+            </div>
+            
+            <!-- Start Time (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Start Time <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="time" name="start_time" value="{{ doctor.start_time|default:'09:00'|time:'H:i' }}" required 
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <!-- End Time (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    End Time <span style="color: #ef4444;">*</span>
+                </label>
+                <input type="time" name="end_time" value="{{ doctor.end_time|default:'17:00'|time:'H:i' }}" required 
+                       style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+            </div>
+            
+            <!-- Slot Duration (half width) -->
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Slot Duration (Minutes)
+                </label>
+                <select name="slot_duration" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                    <option value="15" {% if doctor.slot_duration == 15 %}selected{% endif %}>15 minutes</option>
+                    <option value="30" {% if doctor.slot_duration == 30 %}selected{% endif %}>30 minutes</option>
+                    <option value="45" {% if doctor.slot_duration == 45 %}selected{% endif %}>45 minutes</option>
+                    <option value="60" {% if doctor.slot_duration == 60 %}selected{% endif %}>60 minutes</option>
+                </select>
+            </div>
+            
+            <!-- Bio (full width) -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                    Bio (Optional)
+                </label>
+                <textarea name="bio" rows="4" placeholder="Tell patients about yourself..."
+                          style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem; font-family: 'Inter', sans-serif;">{{ doctor.bio|default:'' }}</textarea>
+            </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 24px; padding: 14px; justify-content: center;">
+            <i class="fas fa-save"></i> Save Profile
+        </button>
+    </form>
+</div>
+
+<style>
+/* Page entrance animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}

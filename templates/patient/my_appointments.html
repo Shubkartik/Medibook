@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - MediBook{% endblock %}
+{% block page_title %}My Appointments{% endblock %}
+
+{% block content %}
+<div style="animation: fadeIn 0.5s ease;">
+    <!-- Status filter buttons - allows user to filter appointments by status -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="{% url 'my_appointments' %}" class="btn {% if not status_filter %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                All
+            </a>
+            <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-clock"></i> Pending
+            </a>
+            <a href="?status=confirmed" class="btn {% if status_filter == 'confirmed' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-check-circle"></i> Confirmed
+            </a>
+            <a href="?status=cancelled" class="btn {% if status_filter == 'cancelled' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-times-circle"></i> Cancelled
+            </a>
+            <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-outline{% endif %} btn-sm">
+                <i class="fas fa-check-double"></i> Completed
+            </a>
+        </div>
+    </div>
+    
+    <!-- Upcoming Appointments Section - shows future appointments -->
+    <div class="glass-card" style="margin-bottom: 24px;">
+        <h3 style="margin-bottom: 20px;">
+            <i class="fas fa-calendar-alt" style="color: var(--primary-color);"></i> 
+            Upcoming Appointments
+        </h3>
+        
+        {% if upcoming_appointments %}
+            {% for appointment in upcoming_appointments %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; 
+                           border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px;
+                           transition: all 0.3s ease;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <!-- Date badge showing day and month -->
+                        <div style="text-align: center; padding: 12px 16px; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); 
+                                   color: white; border-radius: 12px; min-width: 65px;">
+                            <div style="font-size: 1.5rem; font-weight: 700;">{{ appointment.appointment_date|date:"d" }}</div>
+                            <div style="font-size: 0.75rem; text-transform: uppercase;">{{ appointment.appointment_date|date:"M" }}</div>
+                        </div>
+                        <!-- Appointment details - doctor name, specialization, time, status -->
+                        <div>
+                            <h4 style="margin-bottom: 4px;">Dr. {{ appointment.doctor.user.get_full_name }}</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 2px;">
+                                <i class="fas fa-stethoscope"></i> {{ appointment.doctor.specialization }}
+                            </p>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 4px;">
+                                <i class="fas fa-clock"></i> {{ appointment.appointment_time }}
+                            </p>
+                            <span class="status-badge status-{{ appointment.status }}">
+                                {{ appointment.status }}
+                            </span>
+                            
+                            <!-- Chat button - only shown for confirmed appointments -->
+                            {% if appointment.status == 'confirmed' %}
+                                <a href="{% url 'start_chat' appointment.id %}" class="btn btn-primary btn-sm" style="margin-top: 8px;">
+                                    <i class="fas fa-comments"></i> Chat with Doctor
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!-- Cancel button - only for pending appointments -->
+                    <div style="display: flex; gap: 8px;">
+                        {% if appointment.status == 'pending' %}
+                            <form method="POST" action="{% url 'cancel_appointment' appointment.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="cancellation_reason" value="Cancelled by patient">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- No upcoming appointments placeholder -->
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <i class="fas fa-calendar-check" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+                <p>No upcoming appointments</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Past Appointments Section - shows completed/cancelled appointments -->
+    <div class="glass-card">
+        <h3 style="margin-bottom: 20px;">
+            <i class="fas fa-history" style="color: var(--primary-color);"></i> 
+            Past Appointments
+        </h3>
+        
+        {% if past_appointments %}
+            {% for appointment in past_appointments %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; 
+                           border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 12px;
+                           opacity: 0.8;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <!-- Muted date badge for past appointments -->
+                        <div style="text-align: center; padding: 12px 16px; background: #e2e8f0; color: #64748b; 
+                                   border-radius: 12px; min-width: 65px;">
+                            <div style="font-size: 1.5rem; font-weight: 700;">{{ appointment.appointment_date|date:"d" }}</div>
+                            <div style="font-size: 0.75rem; text-transform: uppercase;">{{ appointment.appointment_date|date:"M" }}</div>
+                        </div>
+                        <!-- Past appointment details -->
+                        <div>
+                            <h4 style="margin-bottom: 4px;">Dr. {{ appointment.doctor.user.get_full_name }}</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 2px;">
+                                <i class="fas fa-stethoscope"></i> {{ appointment.doctor.specialization }}
+                            </p>
+                            <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 4px;">
+                                <i class="fas fa-clock"></i> {{ appointment.appointment_time }}
+                            </p>
+                            <span class="status-badge status-{{ appointment.status }}">
+                                {{ appointment.status }}
+                            </span>
+                            
+                            <!-- Chat button for past confirmed appointments -->
+                            {% if appointment.status == 'confirmed' %}
+                                <a href="{% url 'start_chat' appointment.id %}" class="btn btn-primary btn-sm" style="margin-top: 8px;">
+                                    <i class="fas fa-comments"></i> Chat with Doctor
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <!-- No past appointments placeholder -->
+            <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                <i class="fas fa-history" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
+                <p>No past appointments</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- CSS animation for fade-in effect -->
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+{% endblock %}

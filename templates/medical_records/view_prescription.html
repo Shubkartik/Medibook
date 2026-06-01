@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Prescription - MediBook{% endblock %}
+{% block page_title %}Prescription Details{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Prescription Card (print-friendly design) -->
+    <div class="glass-card" id="prescriptionPrint" style="border: 2px solid #2563eb;">
+        
+        <!-- Header with clinic name -->
+        <div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 20px;">
+            <h2 style="color: #2563eb; margin: 0;">🏥 MediBook</h2>
+            <p style="color: #64748b; margin: 4px 0;">Digital Prescription</p>
+            <p style="font-size: 0.8rem; color: #94a3b8;">Prescription ID: #{{ prescription.id }}</p>
+        </div>
+        
+        <!-- Doctor & Patient Info (two columns) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <!-- Doctor details -->
+            <div>
+                <p style="margin: 2px 0;"><strong>👨‍⚕️ Doctor:</strong> Dr. {{ prescription.doctor.user.get_full_name }}</p>
+                <p style="margin: 2px 0; font-size: 0.9rem; color: #64748b;">{{ prescription.doctor.specialization }}</p>
+                <p style="margin: 2px 0; font-size: 0.9rem; color: #64748b;">Reg. No: {{ prescription.doctor.registration_number }}</p>
+            </div>
+            <!-- Patient details -->
+            <div>
+                <p style="margin: 2px 0;"><strong>👤 Patient:</strong> {{ prescription.patient.get_full_name }}</p>
+                <p style="margin: 2px 0; font-size: 0.9rem; color: #64748b;">Date: {{ prescription.created_at|date:"d M, Y" }}</p>
+            </div>
+        </div>
+        
+        <!-- Diagnosis Section -->
+        <div style="background: #f0f9ff; padding: 16px; border-radius: 10px; margin-bottom: 20px;">
+            <h4 style="color: #2563eb; margin-bottom: 8px;">📋 Diagnosis</h4>
+            <p style="margin: 0;">{{ prescription.diagnosis }}</p>
+            <!-- Show symptoms if provided -->
+            {% if prescription.symptoms %}
+                <p style="margin: 8px 0 0; font-size: 0.9rem;"><strong>Symptoms:</strong> {{ prescription.symptoms }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- Medicines Table -->
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: #2563eb; margin-bottom: 12px;">💊 Prescribed Medicines</h4>
+            
+            {% if medicines %}
+                <!-- Table format for medicines -->
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc;">
+                            <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Medicine</th>
+                            <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Dosage</th>
+                            <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Frequency</th>
+                            <th style="padding: 10px; text-align: left; border: 1px solid #e2e8f0;">Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through each medicine -->
+                        {% for med in medicines %}
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0;">{{ med.medicine_name }}</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0;">{{ med.dosage }}</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0;">{{ med.frequency }}</td>
+                                <td style="padding: 10px; border: 1px solid #e2e8f0;">{{ med.duration }}</td>
+                            </tr>
+                            <!-- Show instructions below medicine if provided -->
+                            {% if med.instructions %}
+                                <tr>
+                                    <td colspan="4" style="padding: 6px 10px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #64748b;">
+                                        <i class="fas fa-info-circle"></i> {{ med.instructions }}
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: #64748b;">No medicines prescribed.</p>
+            {% endif %}
+        </div>
+        
+        <!-- Additional Notes (shown if present) -->
+        {% if prescription.notes %}
+            <div style="margin-bottom: 20px;">
+                <h4 style="color: #2563eb; margin-bottom: 8px;">📝 Notes</h4>
+                <p style="margin: 0;">{{ prescription.notes }}</p>
+            </div>
+        {% endif %}
+        
+        <!-- Follow-up Date (shown if set) -->
+        {% if prescription.follow_up_date %}
+            <div style="background: #fef3c7; padding: 12px; border-radius: 10px; margin-bottom: 20px;">
+                <strong>📅 Follow-up Date:</strong> {{ prescription.follow_up_date|date:"d M, Y" }}
+            </div>
+        {% endif %}
+        
+        <!-- Footer disclaimer -->
+        <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 16px; font-size: 0.8rem; color: #94a3b8;">
+            <p>This is a digital prescription generated by MediBook.</p>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div style="display: flex; gap: 12px; margin-top: 20px; justify-content: center; flex-wrap: wrap;">
+        <!-- Print button (opens browser print dialog) -->
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print"></i> Print Prescription
+        </button>
+        
+        <!-- Edit and Delete buttons (only for the doctor who created it) -->
+        {% if request.user.profile.role == 'doctor' and prescription.doctor.user == request.user %}
+            <a href="{% url 'edit_prescription' prescription.id %}" class="btn btn-outline">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a href="{% url 'delete_prescription' prescription.id %}" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </a>
+        {% endif %}
+        
+        <!-- Back button (different for patient vs doctor) -->
+        {% if request.user.profile.role == 'patient' %}
+            <a href="{% url 'patient_medical_history' %}" class="btn btn-outline">Back to Records</a>
+        {% else %}
+            <a href="{% url 'doctor_prescriptions' %}" class="btn btn-outline">Back to Prescriptions</a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Print styles - hide unnecessary elements when printing */
+@media print {
+    .sidebar, .top-nav, .btn, .no-print { display: none !important; }
+    .main-content { margin-left: 0 !important; padding: 0 !important; }
+    body { background: white !important; }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Prescription - MediBook{% endblock %}
+{% block page_title %}Create Prescription{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+    <!-- Header with patient info -->
+    <div style="margin-bottom: 24px;">
+        <h3><i class="fas fa-prescription"></i> New Prescription</h3>
+        <p style="color: var(--text-secondary);">
+            Patient: <strong>{{ patient.get_full_name }}</strong> | 
+            Date: <strong>{{ today|date:"d M, Y" }}</strong>
+        </p>
+    </div>
+    
+    <!-- Prescription form with client-side validation -->
+    <form method="POST" id="prescriptionForm" onsubmit="return validateForm()">
+        {% csrf_token %}
+        
+        <!-- Diagnosis field (required) -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                Diagnosis <span style="color: #ef4444;">*</span>
+            </label>
+            <textarea name="diagnosis" id="diagnosis" rows="2" required 
+                      placeholder="Enter diagnosis (required)..."
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif; box-sizing: border-box;"></textarea>
+            <!-- Validation error message (hidden by default) -->
+            <small id="diagnosisError" style="color: #ef4444; display: none;">Diagnosis is required.</small>
+        </div>
+        
+        <!-- Symptoms field (optional) -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Symptoms</label>
+            <textarea name="symptoms" rows="2" placeholder="Patient symptoms..."
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif; box-sizing: border-box;"></textarea>
+        </div>
+        
+        <!-- Medicines Section -->
+        <div style="margin-bottom: 20px; border-top: 2px solid #e2e8f0; padding-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h4 style="margin: 0;">💊 Medicines <span style="color: #ef4444;">*</span></h4>
+                <small style="color: #64748b;">At least one medicine is required</small>
+            </div>
+            <!-- Medicine validation error (hidden by default) -->
+            <small id="medicineError" style="color: #ef4444; display: none;">At least one medicine with name is required.</small>
+            
+            <!-- Container for medicine rows -->
+            <div id="medicinesContainer">
+                <!-- First medicine row (default) -->
+                <div class="medicine-row" style="margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <!-- Medicine Name -->
+                    <div style="margin-bottom: 10px;">
+                        <label style="font-size: 0.85rem; font-weight: 500;">Medicine Name <span style="color: #ef4444;">*</span></label>
+                        <input type="text" name="medicine_name[]" class="med-name" placeholder="e.g., Amoxicillin" 
+                               style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+                    </div>
+                    <!-- Dosage, Frequency, Duration in 3 columns -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label style="font-size: 0.8rem; color: #64748b;">Dosage</label>
+                            <input type="text" name="dosage[]" placeholder="e.g., 500mg" 
+                                   style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #64748b;">Frequency</label>
+                            <input type="text" name="frequency[]" placeholder="e.g., Twice a day" 
+                                   style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem; color: #64748b;">Duration</label>
+                            <input type="text" name="duration[]" placeholder="e.g., 5 days" 
+                                   style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <!-- Special Instructions -->
+                    <div>
+                        <label style="font-size: 0.8rem; color: #64748b;">Instructions</label>
+                        <input type="text" name="instructions[]" placeholder="e.g., Take after food" 
+                               style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+                    </div>
+                    <!-- Remove button (hidden for first row) -->
+                    <button type="button" onclick="removeMedicine(this)" class="btn btn-danger btn-sm" style="margin-top: 10px; display: none;">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+            </div>
+            <!-- Add more medicine button -->
+            <button type="button" onclick="addMedicine()" class="btn btn-outline btn-sm" style="margin-top: 8px;">
+                <i class="fas fa-plus"></i> Add Another Medicine
+            </button>
+        </div>
+        
+        <!-- Follow-up Date (optional) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Follow-up Date</label>
+                <input type="date" name="follow_up_date" 
+                       style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; box-sizing: border-box;">
+            </div>
+        </div>
+        
+        <!-- Additional Notes (optional) -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">Additional Notes</label>
+            <textarea name="notes" rows="3" placeholder="Any additional instructions..."
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif; box-sizing: border-box;"></textarea>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center;">
+            <i class="fas fa-save"></i> Save Prescription
+        </button>
+    </form>
+</div>
+
+<script>
+// Add a new medicine row to the form
+function addMedicine() {
+    var container = document.getElementById('medicinesContainer');
+    var row = document.createElement('div');
+    row.className = 'medicine-row';
+    row.style.cssText = 'margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;';
+    // Create medicine row HTML with all fields
+    row.innerHTML = `
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 0.85rem; font-weight: 500;">Medicine Name <span style="color: #ef4444;">*</span></label>
+            <input type="text" name="medicine_name[]" class="med-name" placeholder="e.g., Amoxicillin" 
+                   style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+                <label style="font-size: 0.8rem; color: #64748b;">Dosage</label>
+                <input type="text" name="dosage[]" placeholder="e.g., 500mg" 
+                       style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; color: #64748b;">Frequency</label>
+                <input type="text" name="frequency[]" placeholder="e.g., Twice a day" 
+                       style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; color: #64748b;">Duration</label>
+                <input type="text" name="duration[]" placeholder="e.g., 5 days" 
+                       style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+            </div>
+        </div>
+        <div>
+            <label style="font-size: 0.8rem; color: #64748b;">Instructions</label>
+            <input type="text" name="instructions[]" placeholder="e.g., Take after food" 
+                   style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+        </div>
+        <button type="button" onclick="removeMedicine(this)" class="btn btn-danger btn-sm" style="margin-top: 10px;">
+            <i class="fas fa-trash"></i> Remove
+        </button>
+    `;
+    container.appendChild(row);
+}
+
+// Remove a medicine row (keep at least one)
+function removeMedicine(btn) {
+    var rows = document.querySelectorAll('.medicine-row');
+    if (rows.length > 1) {  // Don't remove if it's the last row
+        btn.closest('.medicine-row').remove();
+    }
+}
+
+// Client-side form validation before submit
+function validateForm() {
+    var diagnosis = document.getElementById('diagnosis').value.trim();
+    var diagnosisError = document.getElementById('diagnosisError');
+    var medicineError = document.getElementById('medicineError');
+    var medNames = document.querySelectorAll('.med-name');
+    
+    var isValid = true;
+    
+    // Validate diagnosis is not empty
+    if (!diagnosis) {
+        diagnosisError.style.display = 'block';
+        document.getElementById('diagnosis').style.borderColor = '#ef4444';
+        isValid = false;
+    } else {
+        diagnosisError.style.display = 'none';
+        document.getElementById('diagnosis').style.borderColor = '#e2e8f0';
+    }
+    
+    // Validate at least one medicine has a name
+    var hasMedicine = false;
+    medNames.forEach(function(input) {
+        if (input.value.trim()) {
+            hasMedicine = true;
+        }
+    });
+    
+    if (!hasMedicine) {
+        medicineError.style.display = 'block';
+        isValid = false;
+    } else {
+        medicineError.style.display = 'none';
+    }
+    
+    return isValid;  // Return false prevents form submission
+}
+</script>
+{% endblock %}

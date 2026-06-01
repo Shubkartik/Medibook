@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Medical Record - MediBook{% endblock %}
+{% block page_title %}Update Medical Record{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="max-width: 600px; margin: 0 auto;">
+    <h3 style="margin-bottom: 20px;">
+        <i class="fas fa-notes-medical" style="color: var(--primary-color);"></i> 
+        Medical Record: {{ patient.get_full_name }}
+    </h3>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Blood Group</label>
+            <select name="blood_group" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px;">
+                <option value="">Select</option>
+                <option value="A+" {% if medical_record.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                <option value="A-" {% if medical_record.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                <option value="B+" {% if medical_record.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                <option value="B-" {% if medical_record.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                <option value="AB+" {% if medical_record.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                <option value="AB-" {% if medical_record.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                <option value="O+" {% if medical_record.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                <option value="O-" {% if medical_record.blood_group == 'O-' %}selected{% endif %}>O-</option>
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Allergies</label>
+            <textarea name="allergies" rows="2" placeholder="e.g., Penicillin, Peanuts"
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif;">{{ medical_record.allergies|default:'' }}</textarea>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Chronic Conditions</label>
+            <textarea name="chronic_conditions" rows="2" placeholder="e.g., Diabetes, Hypertension"
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif;">{{ medical_record.chronic_conditions|default:'' }}</textarea>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Current Medications</label>
+            <textarea name="current_medications" rows="2" placeholder="e.g., Metformin 500mg"
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif;">{{ medical_record.current_medications|default:'' }}</textarea>
+        </div>
+        
+        <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 6px; font-weight: 500;">Notes</label>
+            <textarea name="notes" rows="3" placeholder="Additional notes..."
+                      style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; font-family: 'Inter', sans-serif;">{{ medical_record.notes|default:'' }}</textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; justify-content: center;">
+            <i class="fas fa-save"></i> Save Record
+        </button>
+    </form>
+</div>
+{% endblock %}
