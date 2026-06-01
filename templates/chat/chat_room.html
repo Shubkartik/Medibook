@@ -6,30 +6,26 @@
 
 {% block content %}
 
-<!-- Main chat container with fixed height -->
 <div style="max-width: 900px; margin: 0 auto; height: calc(100vh - 140px); display: flex; flex-direction: column; overflow: hidden;">
     
-    <!-- Fixed Header with user info -->
     <div class="glass-card" style="border-radius: 16px 16px 0 0; padding: 16px 20px; flex-shrink: 0;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 16px;">
-                <!-- Avatar with initials -->
                 <div style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem;">
                     {{ other_user.first_name|first }}{{ other_user.last_name|first }}
                 </div>
                 <div>
-                    <!-- Show "Dr." prefix for doctors -->
                     <h4 style="margin: 0;">
                         {% if request.user.profile.role == 'patient' %}Dr. {{ other_user.get_full_name }}{% else %}{{ other_user.get_full_name }}{% endif %}
                     </h4>
-                    <!-- Online status indicator -->
                     <small style="color: var(--success-color);"><i class="fas fa-circle" style="font-size: 0.5rem;"></i> Online</small>
                 </div>
             </div>
-            <!-- Back button -->
-            <a href="{% url 'chat_list' %}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="location.reload()" class="btn btn-outline btn-sm" title="Refresh chat"><i class="fas fa-sync-alt"></i></button>
+                <a href="{% url 'chat_list' %}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+            </div>
         </div>
-        <!-- Appointment details bar -->
         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">
             <small style="color: var(--text-secondary); font-size: 0.8rem;">
                 <i class="fas fa-calendar"></i> {{ room.appointment.appointment_date|date:"d M, Y" }} | 
@@ -39,28 +35,22 @@
         </div>
     </div>
     
-    <!-- Scrollable Messages Area -->
     <div class="glass-card" id="chatBox" style="border-radius: 0; flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; min-height: 0;">
         {% if chat_msgs %}
-            <!-- Loop through messages (reversed for newest last) -->
             {% for msg in chat_msgs reversed %}
                 {% if msg.sender == request.user %}
-                <!-- Sent message (right aligned) -->
                 <div style="display: flex; margin-bottom: 12px; justify-content: flex-end;">
                     <div style="max-width: 70%; padding: 10px 14px; border-radius: 12px 12px 0 12px; word-wrap: break-word; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white;">
                 {% else %}
-                <!-- Received message (left aligned) -->
                 <div style="display: flex; margin-bottom: 12px; justify-content: flex-start;">
                     <div style="max-width: 70%; padding: 10px 14px; border-radius: 12px 12px 12px 0; word-wrap: break-word; background: #f1f5f9; color: var(--text-primary);">
                 {% endif %}
                         <p style="margin: 0; font-size: 0.95rem;">{{ msg.content }}</p>
-                        <!-- Message timestamp -->
                         <small style="opacity: 0.7; display: block; margin-top: 3px; font-size: 0.65rem;">{{ msg.timestamp|time:"h:i A" }}</small>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <!-- Empty state -->
             <div style="text-align: center; color: var(--text-secondary); padding-top: 60px;">
                 <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 16px; display: block;"></i>
                 <p>No messages yet. Start the conversation!</p>
@@ -68,14 +58,11 @@
         {% endif %}
     </div>
     
-    <!-- Fixed Input Area -->
     <div class="glass-card" style="border-radius: 0 0 16px 16px; border-top: 1px solid var(--border-color); padding: 12px 20px; flex-shrink: 0;">
         <div style="display: flex; gap: 10px;">
-            <!-- Message input field -->
             <input type="text" id="msgInput" placeholder="Type your message..." 
                    style="flex: 1; padding: 10px 14px; border: 2px solid var(--border-color); border-radius: 25px; font-size: 0.95rem; outline: none; font-family: 'Inter', sans-serif;"
                    autocomplete="off">
-            <!-- Send button (circular) -->
             <button id="btnSend" class="btn btn-primary" style="border-radius: 50%; width: 44px; height: 44px; padding: 0; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-paper-plane" style="font-size: 0.9rem;"></i>
             </button>
@@ -84,115 +71,104 @@
 </div>
 
 <style>
-/* Prevent body scroll, chat has its own scroll */
-html, body {
-    overflow: hidden;
-    height: 100%;
-}
+html, body { overflow: hidden; height: 100%; }
+.main-content { overflow: hidden; }
 
-.main-content {
-    overflow: hidden;
-}
+#chatBox::-webkit-scrollbar { width: 5px; }
+#chatBox::-webkit-scrollbar-track { background: transparent; }
+#chatBox::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
 
-/* Custom scrollbar for chat area */
-#chatBox::-webkit-scrollbar { 
-    width: 5px; 
-}
-#chatBox::-webkit-scrollbar-track { 
-    background: transparent; 
-}
-#chatBox::-webkit-scrollbar-thumb { 
-    background: #d1d5db; 
-    border-radius: 10px; 
-}
-#chatBox::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-}
-
-/* New message animation */
 @keyframes fadeInUp {
-    from { 
-        opacity: 0; 
-        transform: translateY(8px); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
 <script>
-// WebSocket connection setup
 var roomId = "{{ room.id }}";
 var userId = "{{ request.user.id }}";
-var socket = new WebSocket('ws://127.0.0.1:8000/ws/chat/' + roomId + '/');
+
+// Use WSS for HTTPS, WS for HTTP
+var protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+var wsUrl = protocol + window.location.host + '/ws/chat/' + roomId + '/';
+
+console.log('Connecting to:', wsUrl);
 
 var box = document.getElementById('chatBox');
+var socket = null;
 
-// Handle incoming messages
-socket.onmessage = function(e) {
-    var data = JSON.parse(e.data);
-    if (data.type !== 'message') return;  // Only handle message type
+function connectWebSocket() {
+    socket = new WebSocket(wsUrl);
     
-    var isMe = (String(data.sender_id) === String(userId));
+    socket.onopen = function() {
+        console.log('WebSocket connected');
+    };
     
-    // Create message container
-    var div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.marginBottom = '12px';
-    div.style.justifyContent = isMe ? 'flex-end' : 'flex-start';  // Right for sent, left for received
-    div.style.animation = 'fadeInUp 0.2s ease';  // Entrance animation
+    socket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        if (data.type !== 'message') return;
+        
+        var isMe = (String(data.sender_id) === String(userId));
+        
+        var div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.marginBottom = '12px';
+        div.style.justifyContent = isMe ? 'flex-end' : 'flex-start';
+        div.style.animation = 'fadeInUp 0.2s ease';
+        
+        var bubble = document.createElement('div');
+        bubble.style.maxWidth = '70%';
+        bubble.style.padding = '10px 14px';
+        bubble.style.wordWrap = 'break-word';
+        
+        if (isMe) {
+            bubble.style.borderRadius = '12px 12px 0 12px';
+            bubble.style.background = 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))';
+            bubble.style.color = 'white';
+        } else {
+            bubble.style.borderRadius = '12px 12px 12px 0';
+            bubble.style.background = '#f1f5f9';
+            bubble.style.color = 'var(--text-primary)';
+        }
+        
+        bubble.innerHTML = '<p style="margin:0;font-size:0.95rem;">' + data.message + '</p><small style="opacity:0.7;display:block;margin-top:3px;font-size:0.65rem;">' + data.timestamp + '</small>';
+        div.appendChild(bubble);
+        box.appendChild(div);
+        
+        box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+    };
     
-    // Create message bubble
-    var bubble = document.createElement('div');
-    bubble.style.maxWidth = '70%';
-    bubble.style.padding = '10px 14px';
-    bubble.style.wordWrap = 'break-word';
+    socket.onclose = function() {
+        console.log('WebSocket disconnected');
+    };
     
-    // Style based on sender
-    if (isMe) {
-        bubble.style.borderRadius = '12px 12px 0 12px';
-        bubble.style.background = 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))';
-        bubble.style.color = 'white';
-    } else {
-        bubble.style.borderRadius = '12px 12px 12px 0';
-        bubble.style.background = '#f1f5f9';
-        bubble.style.color = 'var(--text-primary)';
-    }
-    
-    // Add message content and timestamp
-    bubble.innerHTML = '<p style="margin:0;font-size:0.95rem;">' + data.message + '</p><small style="opacity:0.7;display:block;margin-top:3px;font-size:0.65rem;">' + data.timestamp + '</small>';
-    div.appendChild(bubble);
-    box.appendChild(div);
-    
-    // Auto-scroll to bottom
-    box.scrollTo({
-        top: box.scrollHeight,
-        behavior: 'smooth'
-    });
-};
+    socket.onerror = function() {
+        console.log('WebSocket error');
+    };
+}
 
-// Send message on button click
-document.getElementById('btnSend').onclick = function() {
+function sendMessage() {
     var input = document.getElementById('msgInput');
     var msg = input.value.trim();
-    if (msg && socket.readyState === 1) {  // Check if WebSocket is open
+    if (msg && socket && socket.readyState === 1) {
         socket.send(JSON.stringify({message: msg}));
-        input.value = '';  // Clear input
-        input.focus();  // Keep focus on input
+        input.value = '';
+        input.focus();
     }
-};
+}
 
-// Send message on Enter key
+document.getElementById('btnSend').onclick = sendMessage;
+
 document.getElementById('msgInput').onkeypress = function(e) {
     if (e.key === 'Enter') {
-        e.preventDefault();  // Prevent form submission
-        document.getElementById('btnSend').click();
+        e.preventDefault();
+        sendMessage();
     }
 };
 
-// Scroll to bottom on load and focus input
+// Connect WebSocket
+connectWebSocket();
+
 box.scrollTop = box.scrollHeight;
 document.getElementById('msgInput').focus();
 </script>
