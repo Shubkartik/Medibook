@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-change-this-in-production-!@#$%^&*()'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG =  False  # Set to False for production
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '.onrender.com']
 
 # Application definition
 INSTALLED_APPS = [
