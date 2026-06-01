@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-change-this-in-production-!@#$%^&*()'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG =  False  # Set to False for production
+DEBUG =  True  # Set to False for production
 
 ALLOWED_HOSTS = ['*', '.onrender.com']
 
@@ -57,6 +57,11 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://*.render.com',
 ]
 
 WSGI_APPLICATION = 'doctor_appointment.wsgi.application'
