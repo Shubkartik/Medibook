@@ -20,15 +20,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-from django.contrib.auth.models import User
-
-# Replace 'admin' with whatever username you see 
-user = User.objects.get(username='admin')
-user.set_password('admin123')
-user.save()
-print(f"Password reset for {user.username}")
-print("New password: NewPassword@123")
-exit()
